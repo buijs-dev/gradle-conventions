@@ -1,5 +1,5 @@
 // KDoc as HTML, per module: the library and gradle-plugin conventions publish it as the
-// javadoc jar (dokkaGeneratePublicationHtml), which javadoc.io shows.
+// Javadoc jar (dokkaGeneratePublicationHtml), which javadoc.io shows.
 plugins {
     id("dev.buijs.conventions.repositories")
     id("org.jetbrains.dokka")

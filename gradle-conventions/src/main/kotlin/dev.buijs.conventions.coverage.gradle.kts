@@ -14,10 +14,8 @@ kover {
 
     reports {
         filters { excludes { annotatedBy("*Generated*") } }
-
         total {
             xml { onCheck = true }
-
             html { onCheck = true }
         }
     }

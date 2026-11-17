@@ -40,7 +40,7 @@ tasks.test {
     systemProperty("conventions.testRepository", testRepository.get().asFile.absolutePath)
 }
 
-// As every published plugin: the sources, and the Dokka HTML as javadoc.
+// As every published plugin: the sources, and the Dokka HTML as Javadoc.
 mavenPublishing {
     configure(GradlePlugin(JavadocJar.Dokka("dokkaGeneratePublicationHtml"), SourcesJar.Sources()))
 }
