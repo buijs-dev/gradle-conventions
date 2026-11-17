@@ -1,3 +1,3 @@
 import dev.buijs.conventions.gradle.buijsDev
 
-repositories { buijsDev(providers) }
+repositories { buijsDev() }

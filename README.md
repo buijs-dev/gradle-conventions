@@ -1,6 +1,6 @@
 # Gradle Conventions
 
-The build logic shared by all buijs-dev JVM repositories (StrataStaX, Fabrio, Rialto and others): convention plugins and a version catalog, published like any other artifact (releases to GitHub Packages, snapshots to Repsy). It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
+The build logic shared by all buijs-dev JVM repositories (StrataStaX, Fabrio, Rialto and others): convention plugins and a version catalog, published like any other artifact (releases to Maven Central, snapshots to Repsy). It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
 
 ## Use
 
@@ -34,8 +34,8 @@ conventions.displayName=Rialto JVM
 | `buijs.library` | a published Kotlin library: all of the below plus `java-library` |
 | `buijs.gradle-plugin` | a published Gradle plugin: all of the below plus `java-gradle-plugin` |
 | `buijs.kotlin` | Kotlin JVM on Java 25, sources and javadoc jars, JUnit Platform |
-| `buijs.repositories` | Gradle Plugin Portal, Maven Central, Maven Local, buijs-dev GitHub Packages (releases) and Repsy (snapshots) |
-| `buijs.publishing` | POM defaults and the `GitHubPackages` / `Repsy` repositories that ci-templates publishes to |
+| `buijs.repositories` | Gradle Plugin Portal, Maven Central (releases), Maven Local and Repsy (`dev.buijs` snapshots) |
+| `buijs.publishing` | the vanniktech maven-publish plugin: POM defaults, releases to Maven Central (`publishToMavenCentral`, signed when a signing key is present) and snapshots to the `Repsy` repository (`publishAllPublicationsToRepsyRepository`), as ci-templates publishes them |
 | `buijs.formatting` | the style plugin with the license header (default MIT, Buijs Software) |
 | `buijs.coverage` | Kover on JaCoCo, XML and HTML reports on `check` |
 | `buijs.dokka` | Dokka HTML with source links to GitHub |

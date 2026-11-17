@@ -8,7 +8,7 @@ import dev.buijs.conventions.gradle.Conventions
 import dev.buijs.conventions.gradle.buijsDev
 
 dependencyResolutionManagement {
-    repositories { buijsDev(providers) }
+    repositories { buijsDev() }
 
     versionCatalogs {
         create("libs") { from("dev.buijs.conventions:gradle-catalog:${Conventions.VERSION}") }

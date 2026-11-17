@@ -1,4 +1,4 @@
-// KDoc as HTML: `./gradlew dokkaGenerate` writes build/dokka/html, ready for GitHub Pages.
+// KDoc as HTML: `./gradlew dokkaGenerate` writes build/dokka/html.
 // Applied to a multi-module root together with `dependencies { dokka(project(":module")) }`
 // for one site over all modules.
 plugins {

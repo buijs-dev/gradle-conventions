@@ -11,6 +11,7 @@ gradle-node = "7.1.0"
 jacoco = "0.8.15"
 kotlin = "2.4.21"
 kover = "0.9.11"
+maven-publish = "0.37.0"
 node = "24.11.1"
 openapi = "7.21.0"
 buijs-style = "1.0.0-SNAPSHOT"
@@ -111,6 +112,7 @@ dokka-plugin = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", ve
 kotlin-plugin-allopen = { group = "org.jetbrains.kotlin.plugin.allopen", name = "org.jetbrains.kotlin.plugin.allopen.gradle.plugin", version.ref = "kotlin" }
 kotlin-plugin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 kover-plugin = { group = "org.jetbrains.kotlinx", name = "kover-gradle-plugin", version.ref = "kover" }
+maven-publish-plugin = { group = "com.vanniktech", name = "gradle-maven-publish-plugin", version.ref = "maven-publish" }
 node-plugin = { group = "com.github.node-gradle.node", name = "com.github.node-gradle.node.gradle.plugin", version.ref = "gradle-node" }
 openapi-plugin = { group = "org.openapi.generator", name = "org.openapi.generator.gradle.plugin", version.ref = "openapi" }
 quarkus-extension-plugin = { group = "io.quarkus.extension", name = "io.quarkus.extension.gradle.plugin", version.ref = "quarkus" }

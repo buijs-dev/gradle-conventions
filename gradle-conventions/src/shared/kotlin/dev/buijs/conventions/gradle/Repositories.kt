@@ -18,39 +18,15 @@
 package dev.buijs.conventions.gradle
 
 import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.provider.ProviderFactory
 
 /**
- * The repositories every build resolves from: the public repositories, Maven Local and
- * the buijs-dev repositories, which only serve `dev.buijs` artifacts. Releases come from GitHub
- * Packages (`gpr.user`/`gpr.key` or `GITHUB_ACTOR`/`GITHUB_TOKEN`), snapshots from Repsy.
+ * The repositories every build resolves from: the public repositories (releases of `dev.buijs`
+ * artifacts come from Maven Central), Maven Local, and Repsy for the `dev.buijs` snapshots.
  */
-fun RepositoryHandler.buijsDev(providers: ProviderFactory) {
+fun RepositoryHandler.buijsDev() {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
-    maven {
-        name = "GitHubPackages"
-        setUrl("https://maven.pkg.github.com/buijs-dev/*")
-        credentials {
-            username =
-                providers
-                    .gradleProperty("gpr.user")
-                    .orElse(providers.environmentVariable("GITHUB_ACTOR"))
-                    .orNull
-            password =
-                providers
-                    .gradleProperty("gpr.key")
-                    .orElse(providers.environmentVariable("GITHUB_TOKEN"))
-                    .orNull
-        }
-
-        mavenContent {
-            releasesOnly()
-            includeGroupByRegex("dev\\.buijs.*")
-        }
-    }
-
     maven {
         name = "Repsy"
         setUrl("https://repo.repsy.io/mvn/buijs-dev/maven")

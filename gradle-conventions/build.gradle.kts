@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.kover.plugin)
     implementation(libs.node.plugin)
     implementation(libs.dokka.plugin)
+    implementation(libs.maven.publish.plugin)
     implementation(libs.buijs.style.plugin)
 }
 

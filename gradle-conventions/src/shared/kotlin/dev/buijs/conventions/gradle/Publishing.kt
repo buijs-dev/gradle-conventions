@@ -17,24 +17,32 @@
 
 package dev.buijs.conventions.gradle
 
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /** Reads a required `conventions.*` property from gradle.properties. */
 internal fun Project.conventionProperty(name: String): String =
     providers.gradleProperty("conventions.$name").orNull
         ?: throw GradleException("Set conventions.$name in gradle.properties")
 
+/** The namespace verified on the Central Portal; Maven Central refuses any other group. */
+private const val NAMESPACE = "dev.buijs"
+
 /**
- * The defaults every publication shares. The version comes from `version` in gradle.properties;
- * the group, repository and display name from `conventions.group`, `conventions.repository` and
- * `conventions.displayName` there. A module only sets its own `description`.
+ * The defaults every publication shares, through the vanniktech maven-publish plugin. The
+ * version comes from `version` in gradle.properties; the group, repository and display name
+ * from `conventions.group`, `conventions.repository` and `conventions.displayName` there. A
+ * module only sets its own `description`.
  *
- * Release versions go to GitHub Packages, snapshots to Repsy. Credentials come from the
- * environment set by the buijs-dev/ci-templates publish workflows, which expect the repository
- * names `GitHubPackages` and `Repsy`.
+ * Releases go to Maven Central, snapshots to Repsy, as the buijs-dev/ci-templates publish
+ * workflows expect: `publishToMavenCentral` (Central Portal, released automatically once it
+ * validates) and `publishAllPublicationsToRepsyRepository`. Publications are signed only when a
+ * signing key is present (`signingInMemoryKey` or `signing.keyId`), so local and snapshot
+ * builds need none. Plugin markers outside the namespace `dev.buijs` (the `buijs.*` convention
+ * plugins, applied without a version) are not published to Maven Central.
  */
 fun Project.configurePublishing() {
     group = conventionProperty("group")
@@ -45,55 +53,53 @@ fun Project.configurePublishing() {
     val pomName = if (this == rootProject) displayName else "$displayName - $name"
     val pomDescription = provider { description }
 
-    extensions.configure(PublishingExtension::class.java) {
-        publications.withType(MavenPublication::class.java).configureEach {
-            pom {
-                name.convention(pomName)
-                description.convention(pomDescription)
-                url.convention(githubUrl)
+    val signed =
+        providers.gradleProperty("signingInMemoryKey").isPresent ||
+            providers.gradleProperty("signing.keyId").isPresent
 
-                licenses {
-                    license {
-                        // conventions.license=Apache-2.0 selects Apache; without it the licence is MIT.
-                        if (licenseId.equals("Apache-2.0", ignoreCase = true)) {
-                            name.set("Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0")
-                            distribution.set("repo")
-                        } else {
-                            name.set("MIT License")
-                            url.set("$githubUrl/blob/main/LICENSE")
-                        }
+    extensions.configure(MavenPublishBaseExtension::class.java) {
+        publishToMavenCentral(automaticRelease = true)
+        if (signed) signAllPublications()
+
+        pom {
+            name.convention(pomName)
+            description.convention(pomDescription)
+            url.convention(githubUrl)
+
+            licenses {
+                license {
+                    // conventions.license=Apache-2.0 selects Apache; without it the licence is MIT.
+                    if (licenseId.equals("Apache-2.0", ignoreCase = true)) {
+                        name.set("Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        distribution.set("repo")
+                    } else {
+                        name.set("MIT License")
+                        url.set("$githubUrl/blob/main/LICENSE")
                     }
                 }
+            }
 
-                developers {
-                    developer {
-                        id.set("buijs-dev")
-                        name.set("Gillian Buijs")
-                        email.set("info@buijs.dev")
-                    }
+            developers {
+                developer {
+                    id.set("buijs-dev")
+                    name.set("Gillian Buijs")
+                    email.set("info@buijs.dev")
                 }
+            }
 
-                scm {
-                    connection.set("scm:git:$githubUrl.git")
-                    developerConnection.set(
-                        "scm:git:ssh://git@github.com/buijs-dev/$repository.git",
-                    )
-                    url.set(githubUrl)
-                }
+            scm {
+                connection.set("scm:git:$githubUrl.git")
+                developerConnection.set(
+                    "scm:git:ssh://git@github.com/buijs-dev/$repository.git",
+                )
+                url.set(githubUrl)
             }
         }
+    }
 
+    extensions.configure(PublishingExtension::class.java) {
         repositories {
-            maven {
-                name = "GitHubPackages"
-                setUrl("https://maven.pkg.github.com/buijs-dev/$repository")
-                credentials {
-                    username = providers.environmentVariable("GITHUB_ACTOR").orNull
-                    password = providers.environmentVariable("GITHUB_TOKEN").orNull
-                }
-            }
-
             maven {
                 name = "Repsy"
                 setUrl("https://repo.repsy.io/mvn/buijs-dev/maven")
@@ -102,6 +108,14 @@ fun Project.configurePublishing() {
                     password = providers.environmentVariable("REPSY_PASSWORD").orNull
                 }
             }
+        }
+    }
+
+    tasks.withType(PublishToMavenRepository::class.java).configureEach {
+        onlyIf("Maven Central only accepts the namespace $NAMESPACE") { task ->
+            val publish = task as PublishToMavenRepository
+            publish.repository.name != "mavenCentral" ||
+                publish.publication.groupId.startsWith(NAMESPACE)
         }
     }
 }
