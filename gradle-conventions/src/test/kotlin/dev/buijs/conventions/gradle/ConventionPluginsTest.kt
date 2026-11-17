@@ -73,7 +73,7 @@ class ConventionPluginsTest {
         assertThat(compile.compilerOptions.javaParameters.get()).isTrue()
         assertThat(compile.compilerOptions.freeCompilerArgs.get())
             .containsExactly("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-        assertThat(project.tasks.names).contains("sourcesJar", "javadocJar")
+        assertThat(project.tasks.names).contains("sourcesJar").doesNotContain("javadocJar")
     }
 
     @Test

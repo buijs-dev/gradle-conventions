@@ -1,9 +1,14 @@
+import com.vanniktech.maven.publish.GradlePlugin
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
+
 plugins {
     `kotlin-dsl`
     id("dev.buijs.conventions.repositories")
     id("dev.buijs.conventions.publishing")
     id("dev.buijs.conventions.formatting")
     id("org.jetbrains.kotlinx.kover")
+    id("org.jetbrains.dokka")
 }
 
 description = "Convention plugins and the settings plugin shared by all buijs-dev JVM builds"
@@ -67,4 +72,9 @@ tasks.test {
     val testRepository = rootProject.layout.buildDirectory.dir("test-repository")
     dependsOn(":gradle-catalog:publishMavenPublicationToTestRepository")
     systemProperty("conventions.testRepository", testRepository.get().asFile.absolutePath)
+}
+
+// As every published plugin: the sources, and the Dokka HTML as javadoc.
+mavenPublishing {
+    configure(GradlePlugin(JavadocJar.Dokka("dokkaGeneratePublicationHtml"), SourcesJar.Sources()))
 }

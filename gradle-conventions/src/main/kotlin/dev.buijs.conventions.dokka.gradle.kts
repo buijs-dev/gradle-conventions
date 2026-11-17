@@ -1,6 +1,5 @@
-// KDoc as HTML: `./gradlew dokkaGenerate` writes build/dokka/html.
-// Applied to a multi-module root together with `dependencies { dokka(project(":module")) }`
-// for one site over all modules.
+// KDoc as HTML, per module: the library and gradle-plugin conventions publish it as the
+// javadoc jar (dokkaGeneratePublicationHtml), which javadoc.io shows.
 plugins {
     id("dev.buijs.conventions.repositories")
     id("org.jetbrains.dokka")

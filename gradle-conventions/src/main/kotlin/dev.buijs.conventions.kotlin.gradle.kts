@@ -9,7 +9,6 @@ java {
 
     sourceCompatibility = JavaVersion.VERSION_25
     withSourcesJar()
-    withJavadocJar()
 }
 
 kotlin {

@@ -150,6 +150,14 @@ class SettingsPluginFunctionalTest {
                 "core-2.0.0-javadoc.jar",
                 "core-2.0.0.pom",
             )
+        // The javadoc jar is the module's Dokka HTML.
+        val javadoc =
+            java.util.zip.ZipFile(File(published, "core-2.0.0-javadoc.jar")).use { zip ->
+                zip.entries().toList().map { it.name }
+            }
+
+        assertThat(javadoc).contains("index.html")
+        assertThat(javadoc.filter { it.endsWith(".html") }).hasSizeGreaterThan(1)
         assertThat(File(published, "core-2.0.0.pom").readText())
             .contains("<name>Sample JVM - core</name>")
             .contains("<description>The core</description>")

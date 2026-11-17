@@ -74,7 +74,7 @@ class QuarkusConventionsTest {
         val project = project("dev.buijs.conventions.quarkus-app")
 
         assertThat(project.tasks.getByName("sourcesJar").enabled).isFalse()
-        assertThat(project.tasks.getByName("javadocJar").enabled).isFalse()
+        assertThat(project.tasks.findByName("javadocJar")).isNull()
     }
 
     @Test
