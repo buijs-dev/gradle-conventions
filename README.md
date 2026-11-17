@@ -31,16 +31,16 @@ conventions.displayName=Rialto JVM
 
 | Plugin | What it configures |
 |---|---|
-| `buijs.library` | a published Kotlin library: all of the below plus `java-library` |
-| `buijs.gradle-plugin` | a published Gradle plugin: all of the below plus `java-gradle-plugin` |
-| `buijs.kotlin` | Kotlin JVM on Java 25, sources and javadoc jars, JUnit Platform |
-| `buijs.repositories` | Gradle Plugin Portal, Maven Central (releases), Maven Local and Repsy (`dev.buijs` snapshots) |
-| `buijs.publishing` | the vanniktech maven-publish plugin: POM defaults, releases to Maven Central (`publishToMavenCentral`, signed when a signing key is present) and snapshots to the `Repsy` repository (`publishAllPublicationsToRepsyRepository`), as ci-templates publishes them |
-| `buijs.formatting` | the style plugin with the license header (default MIT, Buijs Software) |
-| `buijs.coverage` | Kover on JaCoCo, XML and HTML reports on `check` |
-| `buijs.dokka` | Dokka HTML with source links to GitHub |
-| `buijs.node` | Node.js (downloaded) for modules that run npm/npx tools |
-| `buijs.quarkus`, `buijs.quarkus-extension` | Quarkus (`settings.quarkus` only) |
-| `buijs.quarkus-app` | a Quarkus service: Kotlin, Quarkus, allOpen for JAX-RS, CDI, JPA and QuarkusTest, `-parameters`, no sources or javadoc jar (`settings.quarkus` only) |
+| `dev.buijs.conventions.library` | a published Kotlin library: all of the below plus `java-library` |
+| `dev.buijs.conventions.gradle-plugin` | a published Gradle plugin: all of the below plus `java-gradle-plugin` |
+| `dev.buijs.conventions.kotlin` | Kotlin JVM on Java 25, sources and javadoc jars, JUnit Platform |
+| `dev.buijs.conventions.repositories` | Gradle Plugin Portal, Maven Central (releases), Maven Local and Repsy (`dev.buijs` snapshots) |
+| `dev.buijs.conventions.publishing` | the vanniktech maven-publish plugin: POM defaults, releases to Maven Central (`publishToMavenCentral`, signed when a signing key is present) and snapshots to the `Repsy` repository (`publishAllPublicationsToRepsyRepository`), as ci-templates publishes them |
+| `dev.buijs.conventions.formatting` | the style plugin with the license header (default MIT, Buijs Software) |
+| `dev.buijs.conventions.coverage` | Kover on JaCoCo, XML and HTML reports on `check` |
+| `dev.buijs.conventions.dokka` | Dokka HTML with source links to GitHub |
+| `dev.buijs.conventions.node` | Node.js (downloaded) for modules that run npm/npx tools |
+| `dev.buijs.conventions.quarkus`, `dev.buijs.conventions.quarkus-extension` | Quarkus (`settings.quarkus` only) |
+| `dev.buijs.conventions.quarkus-app` | a Quarkus service: Kotlin, Quarkus, allOpen for JAX-RS, CDI, JPA and QuarkusTest, `-parameters`, no sources or javadoc jar (`settings.quarkus` only) |
 
 Product-specific build logic, such as an OpenAPI generator for one product's server interfaces, does not belong here; it stays in that product's repository.

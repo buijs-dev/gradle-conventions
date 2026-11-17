@@ -2,5 +2,5 @@
 // one build service for every module and needs the Kotlin plugin next to it.
 plugins {
     `kotlin-dsl` apply false
-    id("buijs.publishing") apply false
+    id("dev.buijs.conventions.publishing") apply false
 }

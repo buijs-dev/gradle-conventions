@@ -1,8 +1,8 @@
 plugins {
     `kotlin-dsl`
-    id("buijs.repositories")
-    id("buijs.publishing")
-    id("buijs.formatting")
+    id("dev.buijs.conventions.repositories")
+    id("dev.buijs.conventions.publishing")
+    id("dev.buijs.conventions.formatting")
 }
 
 description = "Convention plugins and the settings plugin shared by all buijs-dev JVM builds"

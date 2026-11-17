@@ -5,16 +5,16 @@ import com.vanniktech.maven.publish.SourcesJar
 // A published Gradle plugin module; `java-gradle-plugin` brings its own `pluginMaven` publication
 // and a marker publication per plugin.
 plugins {
-    id("buijs.kotlin")
-    id("buijs.repositories")
-    id("buijs.publishing")
-    id("buijs.formatting")
-    id("buijs.coverage")
-    id("buijs.dokka")
+    id("dev.buijs.conventions.kotlin")
+    id("dev.buijs.conventions.repositories")
+    id("dev.buijs.conventions.publishing")
+    id("dev.buijs.conventions.formatting")
+    id("dev.buijs.conventions.coverage")
+    id("dev.buijs.conventions.dokka")
     `java-gradle-plugin`
 }
 
-// The sources and javadoc jars Maven Central requires come from buijs.kotlin (withSourcesJar,
+// The sources and javadoc jars Maven Central requires come from dev.buijs.conventions.kotlin (withSourcesJar,
 // withJavadocJar), so the plugin adds none of its own.
 mavenPublishing {
     configure(GradlePlugin(JavadocJar.None(), SourcesJar.None()))

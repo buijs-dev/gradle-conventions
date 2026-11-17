@@ -21,15 +21,11 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /** Reads a required `conventions.*` property from gradle.properties. */
 internal fun Project.conventionProperty(name: String): String =
     providers.gradleProperty("conventions.$name").orNull
         ?: throw GradleException("Set conventions.$name in gradle.properties")
-
-/** The namespace verified on the Central Portal; Maven Central refuses any other group. */
-private const val NAMESPACE = "dev.buijs"
 
 /**
  * The defaults every publication shares, through the vanniktech maven-publish plugin. The
@@ -41,8 +37,7 @@ private const val NAMESPACE = "dev.buijs"
  * workflows expect: `publishToMavenCentral` (Central Portal, released automatically once it
  * validates) and `publishAllPublicationsToRepsyRepository`. Publications are signed only when a
  * signing key is present (`signingInMemoryKey` or `signing.keyId`), so local and snapshot
- * builds need none. Plugin markers outside the namespace `dev.buijs` (the `buijs.*` convention
- * plugins, applied without a version) are not published to Maven Central.
+ * builds need none.
  */
 fun Project.configurePublishing() {
     group = conventionProperty("group")
@@ -108,14 +103,6 @@ fun Project.configurePublishing() {
                     password = providers.environmentVariable("REPSY_PASSWORD").orNull
                 }
             }
-        }
-    }
-
-    tasks.withType(PublishToMavenRepository::class.java).configureEach {
-        onlyIf("Maven Central only accepts the namespace $NAMESPACE") { task ->
-            val publish = task as PublishToMavenRepository
-            publish.repository.name != "mavenCentral" ||
-                publish.publication.groupId.startsWith(NAMESPACE)
         }
     }
 }

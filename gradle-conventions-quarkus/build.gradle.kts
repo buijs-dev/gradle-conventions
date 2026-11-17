@@ -1,8 +1,8 @@
 plugins {
     `kotlin-dsl`
-    id("buijs.repositories")
-    id("buijs.publishing")
-    id("buijs.formatting")
+    id("dev.buijs.conventions.repositories")
+    id("dev.buijs.conventions.publishing")
+    id("dev.buijs.conventions.formatting")
 }
 
 description = "The conventions plus the Quarkus convention plugins"

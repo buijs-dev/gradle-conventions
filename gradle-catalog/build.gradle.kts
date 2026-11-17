@@ -1,6 +1,6 @@
 plugins {
     `version-catalog`
-    id("buijs.publishing")
+    id("dev.buijs.conventions.publishing")
 }
 
 description = "The version catalog shared by all buijs-dev JVM builds"

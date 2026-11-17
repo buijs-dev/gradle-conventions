@@ -1,11 +1,11 @@
 // A Quarkus service: Kotlin with the Quarkus plugin, classes Quarkus proxies left open, and
 // parameter names kept for JAX-RS and CDI. It ships as an image, so no sources or javadoc jar.
 plugins {
-    id("buijs.kotlin")
-    id("buijs.repositories")
-    id("buijs.formatting")
-    id("buijs.coverage")
-    id("buijs.quarkus")
+    id("dev.buijs.conventions.kotlin")
+    id("dev.buijs.conventions.repositories")
+    id("dev.buijs.conventions.formatting")
+    id("dev.buijs.conventions.coverage")
+    id("dev.buijs.conventions.quarkus")
     id("org.jetbrains.kotlin.plugin.allopen")
 }
 

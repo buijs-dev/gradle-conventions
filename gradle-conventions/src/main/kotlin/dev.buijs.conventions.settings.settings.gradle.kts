@@ -1,6 +1,6 @@
 // The entry point of a build, applied in settings.gradle.kts:
 //     plugins { id("dev.buijs.conventions.settings") version "<version>" }
-// Puts the buijs.* convention plugins on the build's classpath (apply them without a version),
+// Puts the dev.buijs.conventions.* plugins on the build's classpath (apply them without a version),
 // resolves dependencies from the buijs-dev repositories and registers the shared `libs` catalog
 // in the same version as this plugin. Versions of the project's own modules belong in
 // modules.versions.toml, registered as the `modules` catalog when present.
