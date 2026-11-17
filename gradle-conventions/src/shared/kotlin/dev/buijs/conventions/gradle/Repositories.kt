@@ -1,0 +1,41 @@
+/**
+ * Copyright (c) 2021 - 2026 Buijs Software
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package dev.buijs.conventions.gradle
+
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+
+/**
+ * The public Repsy repository of buijs-dev: all `dev.buijs` snapshots and the releases of the
+ * build tooling. Reading it needs no credentials.
+ */
+const val REPSY_URL = "https://repo.repsy.io/mvn/buijs-dev/maven"
+
+/**
+ * The repositories every build resolves from: the public repositories (releases of the
+ * `dev.buijs` libraries come from Maven Central), Maven Local, and Repsy for the `dev.buijs`
+ * snapshots and build tooling.
+ */
+fun RepositoryHandler.buijsDev() {
+    gradlePluginPortal()
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = "Repsy"
+        setUrl(REPSY_URL)
+    }
+}

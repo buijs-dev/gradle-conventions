@@ -1,0 +1,21 @@
+import com.vanniktech.maven.publish.GradlePlugin
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
+
+// A published Gradle plugin module; `java-gradle-plugin` brings its own `pluginMaven` publication
+// and a marker publication per plugin.
+plugins {
+    id("dev.buijs.conventions.kotlin")
+    id("dev.buijs.conventions.repositories")
+    id("dev.buijs.conventions.publishing")
+    id("dev.buijs.conventions.formatting")
+    id("dev.buijs.conventions.coverage")
+    id("dev.buijs.conventions.dokka")
+    `java-gradle-plugin`
+}
+
+// The jars every publication carries, as Maven Central requires: the sources from
+// dev.buijs.conventions.kotlin (withSourcesJar), and as Javadoc this module's Dokka HTML.
+mavenPublishing {
+    configure(GradlePlugin(JavadocJar.Dokka("dokkaGeneratePublicationHtml"), SourcesJar.None()))
+}

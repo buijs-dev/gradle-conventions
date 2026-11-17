@@ -1,0 +1,19 @@
+name: Publish Release
+
+# Merging the release pull request (develop into main) publishes the release to Repsy: the
+# conventions are build tooling and never go to Maven Central.
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    uses: buijs-dev/ci-templates/.github/workflows/publish-release.yml@main
+    with:
+      root-dir: ${{ vars.ROOT_DIR || '.' }}
+      target: repsy
+    secrets: inherit
