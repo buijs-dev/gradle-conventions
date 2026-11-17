@@ -1,6 +1,6 @@
 # Gradle Conventions
 
-The build logic shared by all buijs-dev JVM repositories (StrataStaX, Fabrio, Rialto and others): convention plugins and a version catalog, published like any other artifact (releases to Maven Central, snapshots to Repsy). It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
+The build logic shared by all buijs-dev JVM repositories: convention plugins and a version catalog, published like any other artifact (releases to Maven Central, snapshots to Repsy). It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
 
 ## Use
 
