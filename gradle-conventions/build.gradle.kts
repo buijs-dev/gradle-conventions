@@ -68,10 +68,8 @@ kover { useJacoco(libs.versions.jacoco.get()) }
 tasks.test {
     useJUnitPlatform()
     // The plugins under test resolve their own dependencies; a test build needs the network.
-    systemProperty("conventions.version", project.version.toString())
-    val testRepository = rootProject.layout.buildDirectory.dir("test-repository")
+    // The tests read the shared catalog from <root>/build/test-repository.
     dependsOn(":gradle-catalog:publishMavenPublicationToTestRepository")
-    systemProperty("conventions.testRepository", testRepository.get().asFile.absolutePath)
 }
 
 // As every published plugin: the sources, and the Dokka HTML as Javadoc.

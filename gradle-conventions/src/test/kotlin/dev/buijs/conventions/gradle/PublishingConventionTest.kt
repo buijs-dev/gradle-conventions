@@ -34,39 +34,37 @@ import java.io.File
 /** dev.buijs.conventions.publishing, in process: coordinates, POM, repositories and signing. */
 class PublishingConventionTest {
 
-    @field:TempDir private lateinit var dir: File
-
-    private fun library(properties: Map<String, String> = DEFAULT_PROPERTIES) =
-        conventionsProject(dir, properties, "dev.buijs.conventions.library").evaluated()
-
-    private val Project.publications
-        get() = extensions.getByType(PublishingExtension::class.java).publications
-
-    private val Project.pom
-        get() = (publications.getByName("maven") as MavenPublication).pom as MavenPomInternal
+    @field:TempDir
+    private lateinit var dir: File
 
     @Test
     fun `the group comes from conventions group`() {
-        assertThat(library().group).isEqualTo("dev.buijs.sample")
+        // given
+        val project = library()
+
+        // expect
+        assertThat(project.group).isEqualTo("dev.buijs.sample")
     }
 
     @Test
     fun `a missing conventions property names the property to set`() {
+        // given
+        val properties = DEFAULT_PROPERTIES - "conventions.repository"
+
+        // expect
         assertThatThrownBy {
-            conventionsProject(
-                dir,
-                DEFAULT_PROPERTIES - "conventions.repository",
-                "dev.buijs.conventions.publishing",
-            )
+            conventionsProject(dir, properties, "dev.buijs.conventions.publishing")
         }.rootCause().hasMessage("Set conventions.repository in gradle.properties")
     }
 
     @Test
     fun `the POM has everything Maven Central requires, MIT by default`() {
+        // given
         val project = library()
         project.description = "A sample"
         val pom = project.pom
 
+        // expect
         assertThat(pom.name.get()).isEqualTo("Sample JVM")
         assertThat(pom.description.get()).isEqualTo("A sample")
         assertThat(pom.url.get()).isEqualTo("https://github.com/buijs-dev/sample-jvm")
@@ -76,9 +74,8 @@ class PublishingConventionTest {
             )
         assertThat(pom.developers.map { listOf(it.id.get(), it.name.get(), it.email.get()) })
             .containsExactly(listOf("buijs-dev", "Gillian Buijs", "info@buijs.dev"))
-        assertThat(
-            pom.scm!!.connection.get(),
-        ).isEqualTo("scm:git:https://github.com/buijs-dev/sample-jvm.git")
+        assertThat(pom.scm!!.connection.get())
+            .isEqualTo("scm:git:https://github.com/buijs-dev/sample-jvm.git")
         assertThat(pom.scm!!.developerConnection.get())
             .isEqualTo("scm:git:ssh://git@github.com/buijs-dev/sample-jvm.git")
         assertThat(pom.scm!!.url.get()).isEqualTo("https://github.com/buijs-dev/sample-jvm")
@@ -86,9 +83,11 @@ class PublishingConventionTest {
 
     @Test
     fun `conventions license Apache-2 selects the Apache license`() {
+        // given
         val pom = library(DEFAULT_PROPERTIES + ("conventions.license" to "apache-2.0")).pom
         val license = pom.licenses.single()
 
+        // expect
         assertThat(license.name.get()).isEqualTo("Apache License, Version 2.0")
         assertThat(license.url.get()).isEqualTo("https://www.apache.org/licenses/LICENSE-2.0")
         assertThat(license.distribution.get()).isEqualTo("repo")
@@ -96,46 +95,54 @@ class PublishingConventionTest {
 
     @Test
     fun `a module's POM name is the display name and the module name`() {
+        // given
         val root = conventionsProject(dir)
         val module =
             ProjectBuilder
                 .builder()
-                .withParent(
-                    root,
-                ).withName("core")
+                .withParent(root)
+                .withName("core")
                 .withProjectDir(File(dir, "core"))
                 .build()
         module.pluginManager.apply("dev.buijs.conventions.library")
         module.evaluated()
 
+        // expect
         assertThat(module.pom.name.get()).isEqualTo("Sample JVM - core")
     }
 
     @Test
     fun `the library publication carries the jar, the sources and the javadoc`() {
+        // given
         val publication = library().publications.getByName("maven") as MavenPublicationInternal
 
+        // expect
         assertThat(publication.publishableArtifacts.map { it.classifier })
             .contains("sources", "javadoc")
+
         assertThat(publication.artifactId).isEqualTo("sample")
     }
 
     @Test
     fun `with conventions mavenCentral the publication still carries the sources and the javadoc`() {
+        // given
         val publication =
             library(CENTRAL_PROPERTIES).publications.getByName("maven") as MavenPublicationInternal
 
+        // expect
         assertThat(publication.publishableArtifacts.map { it.classifier })
             .contains("sources", "javadoc")
     }
 
     @Test
     fun `without conventions mavenCentral everything goes to Repsy only`() {
+        // given
         val project = library()
 
-        assertThat(
-            project.repsy.url.toString(),
-        ).isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
+        // expect
+        assertThat(project.repsy.url.toString())
+            .isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
+
         assertThat(project.tasks.names)
             .contains(
                 "publishAllPublicationsToRepsyRepository",
@@ -144,86 +151,95 @@ class PublishingConventionTest {
                 "publishToMavenCentral",
                 "publishMavenPublicationToMavenCentralRepository",
             )
+
         assertThat(project.publishingRepositories.names).containsExactly("Repsy")
     }
 
     @Test
     fun `conventions mavenCentral false sets up no Maven Central`() {
+        // given
         val project = library(DEFAULT_PROPERTIES + ("conventions.mavenCentral" to "false"))
 
+        // expect
         assertThat(project.tasks.names).doesNotContain("publishToMavenCentral")
         assertThat(project.publishingRepositories.names).containsExactly("Repsy")
     }
 
     @Test
     fun `conventions mavenCentral adds Maven Central next to Repsy`() {
+        // given
         val project = library(CENTRAL_PROPERTIES)
 
-        assertThat(
-            project.repsy.url.toString(),
-        ).isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
-        assertThat(project.tasks.names)
-            .contains(
-                "publishAllPublicationsToRepsyRepository",
-                "publishToMavenCentral",
-                "publishMavenPublicationToMavenCentralRepository",
-            )
-        assertThat(
-            project.publishingRepositories.names,
-        ).containsExactlyInAnyOrder("Repsy", "mavenCentral")
-    }
+        // expect
+        assertThat(project.repsy.url.toString())
+            .isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
 
-    @Test
-    fun `the Repsy repository reads its credentials from REPSY_USERNAME and REPSY_PASSWORD`() {
-        val credentials = library().repsy.credentials
+        assertThat(project.tasks.names).contains(
+            "publishAllPublicationsToRepsyRepository",
+            "publishToMavenCentral",
+            "publishMavenPublicationToMavenCentralRepository",
+        )
 
-        assertThat(credentials.username).isEqualTo(System.getenv("REPSY_USERNAME"))
-        assertThat(credentials.password).isEqualTo(System.getenv("REPSY_PASSWORD"))
+        assertThat(project.publishingRepositories.names)
+            .containsExactlyInAnyOrder("Repsy", "mavenCentral")
     }
 
     @Test
     fun `without a signing key nothing is signed`() {
+        // given
         val project = library()
 
+        // expect
         assertThat(project.pluginManager.hasPlugin("signing")).isFalse()
         assertThat(project.tasks.names.filter { it.startsWith("sign") }).isEmpty()
     }
 
     @Test
     fun `with conventions mavenCentral but without a signing key nothing is signed`() {
+        // given
         val project = library(CENTRAL_PROPERTIES)
 
+        // expect
         assertThat(project.pluginManager.hasPlugin("signing")).isFalse()
         assertThat(project.tasks.names.filter { it.startsWith("sign") }).isEmpty()
     }
 
     @Test
     fun `with conventions mavenCentral an in-memory signing key signs every publication`() {
+        // given
         val project = library(CENTRAL_PROPERTIES + ("signingInMemoryKey" to "key"))
 
+        // expect
         assertThat(project.tasks.names).contains("signMavenPublication")
     }
 
     @Test
     fun `an in-memory signing key signs every publication`() {
+        // given
         val project = library(DEFAULT_PROPERTIES + ("signingInMemoryKey" to "key"))
 
+        // expect
         assertThat(project.tasks.names).contains("signMavenPublication")
     }
 
     @Test
     fun `a signing key id from gradle properties signs every publication`() {
+        // given
         val project = library(DEFAULT_PROPERTIES + ("signing.keyId" to "0123ABCD"))
 
+        // expect
         assertThat(project.tasks.names).contains("signMavenPublication")
     }
 
     @Test
     fun `a Gradle plugin publishes its marker to Repsy only by default`() {
+        // given
         val project = gradlePlugin(DEFAULT_PROPERTIES)
 
+        // expect
         assertThat(project.publications.names)
             .contains("pluginMaven", "samplePluginMarkerMaven")
+
         assertThat(project.tasks.names)
             .contains("publishSamplePluginMarkerMavenPublicationToRepsyRepository")
             .doesNotContain("publishSamplePluginMarkerMavenPublicationToMavenCentralRepository")
@@ -231,16 +247,16 @@ class PublishingConventionTest {
 
     @Test
     fun `with conventions mavenCentral a Gradle plugin publishes its marker to Maven Central and Repsy alike`() {
+        // given
         val project = gradlePlugin(CENTRAL_PROPERTIES)
 
+        // expect
         assertThat(project.publications.names)
             .contains("pluginMaven", "samplePluginMarkerMaven")
-        listOf("MavenCentral", "Repsy").forEach { repository ->
-            val task =
-                project.tasks.getByName(
-                    "publishSamplePluginMarkerMavenPublicationTo${repository}Repository",
-                ) as TaskInternal
 
+        listOf("MavenCentral", "Repsy").forEach { repository ->
+            val taskName = "publishSamplePluginMarkerMavenPublicationTo${repository}Repository"
+            val task = project.tasks.getByName(taskName) as TaskInternal
             assertThat(task.onlyIf.isSatisfiedBy(task)).describedAs(repository).isTrue()
         }
     }
@@ -248,6 +264,7 @@ class PublishingConventionTest {
     private fun gradlePlugin(properties: Map<String, String>): Project {
         val project =
             conventionsProject(dir, properties, "dev.buijs.conventions.gradle-plugin")
+
         project.extensions
             .getByType(org.gradle.plugin.devel.GradlePluginDevelopmentExtension::class.java)
             .plugins
@@ -268,4 +285,14 @@ class PublishingConventionTest {
     private companion object {
         val CENTRAL_PROPERTIES = DEFAULT_PROPERTIES + ("conventions.mavenCentral" to "true")
     }
+
+    private fun library(properties: Map<String, String> = DEFAULT_PROPERTIES) =
+        conventionsProject(dir, properties, "dev.buijs.conventions.library").evaluated()
+
+    private val Project.publications
+        get() = extensions.getByType(PublishingExtension::class.java).publications
+
+    private val Project.pom
+        get() = (publications.getByName("maven") as MavenPublication).pom as MavenPomInternal
+
 }

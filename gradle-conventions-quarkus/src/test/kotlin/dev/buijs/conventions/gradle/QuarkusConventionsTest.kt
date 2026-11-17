@@ -30,32 +30,15 @@ import java.io.File
 /** The Quarkus conventions: a service in process, and the settings plugin in a real build. */
 class QuarkusConventionsTest {
 
-    @field:TempDir private lateinit var dir: File
-
-    private fun project(plugin: String): Project {
-        File(dir, "gradle.properties").writeText(
-            "conventions.group=dev.buijs.sample\nconventions.repository=sample\nconventions.displayName=Sample\n",
-        )
-        return ProjectBuilder
-            .builder()
-            .withProjectDir(
-                dir,
-            ).build()
-            .also { it.pluginManager.apply(plugin) }
-    }
-
-    // The extension keeps its annotations internal; the field is all there is to read.
-    @Suppress("UNCHECKED_CAST")
-    private fun AllOpenExtension.openAnnotations(): Iterable<String> =
-        AllOpenExtension::class.java
-            .getDeclaredField("myAnnotations")
-            .apply { isAccessible = true }
-            .get(this) as Iterable<String>
+    @field:TempDir
+    private lateinit var dir: File
 
     @Test
     fun `a Quarkus service leaves classes Quarkus proxies open and keeps parameter names`() {
+        // given
         val project = project("dev.buijs.conventions.quarkus-app")
 
+        // expect
         assertThat(project.pluginManager.hasPlugin("io.quarkus")).isTrue()
         assertThat(project.extensions.getByType(AllOpenExtension::class.java).openAnnotations())
             .containsExactlyInAnyOrder(
@@ -71,22 +54,31 @@ class QuarkusConventionsTest {
 
     @Test
     fun `a Quarkus service ships as an image, without sources or javadoc jar`() {
+        // given
         val project = project("dev.buijs.conventions.quarkus-app")
 
+        // expect
         assertThat(project.tasks.getByName("sourcesJar").enabled).isFalse()
         assertThat(project.tasks.findByName("javadocJar")).isNull()
     }
 
     @Test
     fun `a Quarkus extension module applies the Quarkus extension plugin`() {
+        // given
         val project = project("dev.buijs.conventions.quarkus-extension")
 
+        // expect
         assertThat(project.pluginManager.hasPlugin("io.quarkus.extension")).isTrue()
     }
 
     @Test
     fun `the Quarkus settings plugin registers the shared catalog too`() {
-        val repository = System.getProperty("conventions.testRepository").replace("\\", "/")
+        // given
+        val repository =
+            File("../build/test-repository")
+                .absoluteFile
+                .normalize()
+                .invariantSeparatorsPath
         File(dir, "settings.gradle.kts").writeText(
             """
             plugins {
@@ -100,6 +92,7 @@ class QuarkusConventionsTest {
             rootProject.name = "sample"
             """.trimIndent() + "\n",
         )
+
         File(dir, "build.gradle.kts").writeText(
             """
             tasks.register("quarkusVersion") {
@@ -109,6 +102,7 @@ class QuarkusConventionsTest {
             """.trimIndent() + "\n",
         )
 
+        // when
         val output =
             GradleRunner
                 .create()
@@ -118,10 +112,31 @@ class QuarkusConventionsTest {
                 .build()
                 .output
 
+        // then
         val quarkus =
-            Regex(
-                """(?m)^quarkus = "(.+)"""",
-            ).find(File("../libs.versions.toml").readText())!!
+            Regex("""(?m)^quarkus = "(.+)"""")
+                .find(File("../libs.versions.toml").readText())!!
         assertThat(output).contains("quarkus=${quarkus.groupValues[1]}")
     }
+
+    private fun project(plugin: String): Project {
+        val content =
+            "conventions.group=dev.buijs.sample\n" +
+                "conventions.repository=sample\n" +
+                "conventions.displayName=Sample\n"
+        File(dir, "gradle.properties").writeText(content)
+        return ProjectBuilder
+            .builder()
+            .withProjectDir(dir)
+            .build()
+            .also { it.pluginManager.apply(plugin) }
+    }
+
+    // The extension keeps its annotations internal; the field is all there is to read.
+    @Suppress("UNCHECKED_CAST")
+    private fun AllOpenExtension.openAnnotations(): Iterable<String> =
+        AllOpenExtension::class.java
+            .getDeclaredField("myAnnotations")
+            .apply { isAccessible = true }
+            .get(this) as Iterable<String>
 }

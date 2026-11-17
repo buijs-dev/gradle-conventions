@@ -36,43 +36,44 @@ import org.gradle.api.tasks.testing.Test as TestTask
 /** The convention plugins besides publishing, in process. */
 class ConventionPluginsTest {
 
-    @field:TempDir private lateinit var dir: File
-
-    private fun project(vararg plugins: String): Project =
-        conventionsProject(dir, plugins = plugins)
-
-    private fun Project.dependencyNames(task: String) =
-        tasks.getByName(task).let { t -> t.taskDependencies.getDependencies(t).map { it.name } }
+    @field:TempDir
+    private lateinit var dir: File
 
     @Test
     fun `repositories are the public ones, Maven Local and Repsy, in that order`() {
+        // given
         val repositories = project("dev.buijs.conventions.repositories").repositories
 
+        // expect
         assertThat(repositories.map { it.name })
             .containsExactly("Gradle Central Plugin Repository", "MavenRepo", "MavenLocal", "Repsy")
+
         assertThat((repositories.getByName("Repsy") as MavenArtifactRepository).url.toString())
             .isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
     }
 
     @Test
     fun `Repsy is read anonymously`() {
+        // given
         val repsy =
             project("dev.buijs.conventions.repositories").repositories.getByName("Repsy")
                 as AuthenticationSupportedInternal
 
+        // expect
         assertThat(repsy.configuredCredentials.isPresent).isFalse()
     }
 
     @Test
     fun `kotlin compiles for Java 25 with the shared compiler options`() {
+        // given
         val project = project("dev.buijs.conventions.kotlin")
         val java = project.extensions.getByType(JavaPluginExtension::class.java)
         val compile =
             project.tasks
-                .withType(
-                    KotlinJvmCompile::class.java,
-                ).getByName("compileKotlin")
+                .withType(KotlinJvmCompile::class.java)
+                .getByName("compileKotlin")
 
+        // expect
         assertThat(
             java.toolchain.languageVersion
                 .get()
@@ -88,21 +89,24 @@ class ConventionPluginsTest {
 
     @Test
     fun `kotlin tests run on the JUnit Platform with the agent and open flags`() {
+        // given
         val test = project("dev.buijs.conventions.kotlin").tasks.getByName("test") as TestTask
 
+        // expect
         assertThat(test.options).isInstanceOf(JUnitPlatformOptions::class.java)
-        assertThat(test.jvmArgs)
-            .contains(
-                "-XX:+EnableDynamicAgentLoading",
-                "-Xshare:off",
-                "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
-            )
+        assertThat(test.jvmArgs).contains(
+            "-XX:+EnableDynamicAgentLoading",
+            "-Xshare:off",
+            "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+        )
     }
 
     @Test
     fun `library brings Kotlin, publishing, formatting, coverage and Dokka`() {
+        // given
         val project = project("dev.buijs.conventions.library")
 
+        // expect
         listOf(
             "java-library",
             "org.jetbrains.kotlin.jvm",
@@ -115,8 +119,10 @@ class ConventionPluginsTest {
 
     @Test
     fun `gradle-plugin brings java-gradle-plugin with the same conventions`() {
+        // given
         val project = project("dev.buijs.conventions.gradle-plugin")
 
+        // expect
         listOf(
             "java-gradle-plugin",
             "org.jetbrains.kotlin.jvm",
@@ -127,16 +133,19 @@ class ConventionPluginsTest {
 
     @Test
     fun `formatting uses the MIT header by default`() {
+        // given
         val style =
-            project(
-                "dev.buijs.conventions.formatting",
-            ).extensions.getByType(KotlinStyleExtension::class.java)
+            project("dev.buijs.conventions.formatting")
+                .extensions
+                .getByType(KotlinStyleExtension::class.java)
 
+        // expect
         assertThat(style.licenseHeader.get()).isEqualTo(LICENSE_HEADER.trim())
     }
 
     @Test
     fun `formatting reads the header from conventions licenseHeaderFile`() {
+        // given
         File(dir, "HEADER").writeText("\n/** Licensed */\n\n")
         val project =
             conventionsProject(
@@ -145,6 +154,7 @@ class ConventionPluginsTest {
                 "dev.buijs.conventions.formatting",
             )
 
+        // expect
         assertThat(
             project.extensions
                 .getByType(KotlinStyleExtension::class.java)
@@ -155,24 +165,28 @@ class ConventionPluginsTest {
 
     @Test
     fun `coverage writes the XML and HTML reports on check`() {
+        // given
         val project = project("dev.buijs.conventions.coverage")
 
+        // expect
         assertThat(project.dependencyNames("check")).contains("koverXmlReport", "koverHtmlReport")
     }
 
     @Test
     fun `dokka names the root after the display name and a module after itself`() {
+        // given
         val root = project("dev.buijs.conventions.dokka")
         val module =
             ProjectBuilder
                 .builder()
-                .withParent(
-                    root,
-                ).withName("core")
+                .withParent(root)
+                .withName("core")
                 .withProjectDir(File(dir, "core"))
                 .build()
+
         module.pluginManager.apply("dev.buijs.conventions.dokka")
 
+        // expect
         assertThat(
             root.extensions
                 .getByType(DokkaExtension::class.java)
@@ -189,19 +203,26 @@ class ConventionPluginsTest {
 
     @Test
     fun `dokka links every source set to its source on GitHub`() {
+        // given
         val project = project("dev.buijs.conventions.kotlin", "dev.buijs.conventions.dokka")
         val sourceSet =
             project.extensions
-                .getByType(
-                    DokkaExtension::class.java,
-                ).dokkaSourceSets
+                .getByType(DokkaExtension::class.java)
+                .dokkaSourceSets
                 .getByName("main")
         val link = sourceSet.sourceLinks.single()
 
-        assertThat(
-            link.remoteUrl.get().toString(),
-        ).isEqualTo("https://github.com/buijs-dev/sample-jvm/tree/main")
+        // expect
+        assertThat(link.remoteUrl.get().toString())
+            .isEqualTo("https://github.com/buijs-dev/sample-jvm/tree/main")
         assertThat(link.remoteLineSuffix.get()).isEqualTo("#L")
         assertThat(link.localDirectory.get().asFile).isEqualTo(project.rootDir)
     }
+
+    private fun project(vararg plugins: String): Project =
+        conventionsProject(dir, plugins = plugins)
+
+    private fun Project.dependencyNames(task: String) =
+        tasks.getByName(task).let { t -> t.taskDependencies.getDependencies(t).map { it.name } }
+
 }
