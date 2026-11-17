@@ -17,7 +17,7 @@
 
 package dev.buijs.conventions.gradle
 
-import dev.buijs.style.gradle.KotlinStyleExtension
+import dev.buijs.kotlinstyle.gradle.KotlinStyleExtension
 import org.gradle.api.Project
 
 /** The default license header of `.kt` sources (MIT, Buijs Software). */
@@ -41,7 +41,7 @@ const val LICENSE_HEADER: String = """
 """
 
 /**
- * The Kotlin style plugin (dev.buijs.style) with a license header: the file named by
+ * The Kotlin style plugin (dev.buijs.kotlin-style) with a license header: the file named by
  * `conventions.licenseHeaderFile` (relative to the root project) when set, otherwise
  * [LICENSE_HEADER].
  */

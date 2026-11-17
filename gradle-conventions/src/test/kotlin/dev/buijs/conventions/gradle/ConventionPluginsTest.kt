@@ -17,7 +17,7 @@
 
 package dev.buijs.conventions.gradle
 
-import dev.buijs.style.gradle.KotlinStyleExtension
+import dev.buijs.kotlinstyle.gradle.KotlinStyleExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
@@ -97,7 +97,7 @@ class ConventionPluginsTest {
             "java-library",
             "org.jetbrains.kotlin.jvm",
             "com.vanniktech.maven.publish",
-            "dev.buijs.style",
+            "dev.buijs.kotlin-style",
             "org.jetbrains.kotlinx.kover",
             "org.jetbrains.dokka",
         ).forEach { assertThat(project.pluginManager.hasPlugin(it)).describedAs(it).isTrue() }
@@ -111,7 +111,7 @@ class ConventionPluginsTest {
             "java-gradle-plugin",
             "org.jetbrains.kotlin.jvm",
             "com.vanniktech.maven.publish",
-            "dev.buijs.style",
+            "dev.buijs.kotlin-style",
         ).forEach { assertThat(project.pluginManager.hasPlugin(it)).describedAs(it).isTrue() }
     }
 

@@ -117,8 +117,8 @@ node-plugin = { group = "com.github.node-gradle.node", name = "com.github.node-g
 openapi-plugin = { group = "org.openapi.generator", name = "org.openapi.generator.gradle.plugin", version.ref = "openapi" }
 quarkus-extension-plugin = { group = "io.quarkus.extension", name = "io.quarkus.extension.gradle.plugin", version.ref = "quarkus" }
 quarkus-plugin = { group = "io.quarkus", name = "io.quarkus.gradle.plugin", version.ref = "quarkus" }
-buijs-style-plugin = { group = "dev.buijs.style", name = "style-gradle-plugin", version.ref = "buijs-style" }
-buijs-style-rules = { group = "dev.buijs.style", name = "style-rules", version.ref = "buijs-style" }
+buijs-style-plugin = { group = "dev.buijs.kotlinstyle", name = "kotlin-style-gradle-plugin", version.ref = "buijs-style" }
+buijs-style-rules = { group = "dev.buijs.kotlinstyle", name = "kotlin-style-rules", version.ref = "buijs-style" }
 
 [bundles]
 logging = ["kotlin-logging", "slf4j"]
