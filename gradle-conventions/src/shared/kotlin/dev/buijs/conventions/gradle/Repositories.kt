@@ -23,7 +23,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
  * The public Repsy repository of buijs-dev: all `dev.buijs` snapshots and the releases of the
  * build tooling. Reading it needs no credentials.
  */
-const val REPSY_URL = "https://repo.repsy.io/buijs-dev/maven2"
+const val REPSY_URL = "https://repo.repsy.io/mvn/buijs-dev/maven"
 
 /**
  * The repositories every build resolves from: the public repositories (releases of the

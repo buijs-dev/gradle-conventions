@@ -9,9 +9,9 @@
 - Catalog: plugin alias `kotlin-jvm`, for builds outside the conventions.
 - Catalog: `buijs-style-rules`, for tools that format generated code.
 - `dev.buijs.conventions.publishing`: the vanniktech maven-publish plugin (catalog `maven-publish`, 0.37.0). Every project
-  publishes to Repsy (`publishAllPublicationsToRepsyRepository`, `https://repo.repsy.io/buijs-dev/maven2`): all snapshots
+  publishes to Repsy (`publishAllPublicationsToRepsyRepository`, `https://repo.repsy.io/mvn/buijs-dev/maven`): all snapshots
   and the releases of build tooling. `conventions.mavenCentral=true` adds Maven Central (`publishToMavenCentral`,
   Central Portal) for a public library. Signed when a signing key is present.
-- `dev.buijs.conventions.repositories`: Repsy `https://repo.repsy.io/buijs-dev/maven2` for `dev.buijs` snapshots and
+- `dev.buijs.conventions.repositories`: Repsy `https://repo.repsy.io/mvn/buijs-dev/maven` for `dev.buijs` snapshots and
   build tooling releases, read without credentials.
 - The conventions themselves are released to Repsy, not to Maven Central.

@@ -1,6 +1,6 @@
 # Gradle Conventions
 
-The build logic shared by all buijs-dev JVM repositories: convention plugins and a version catalog, published as build tooling: releases and snapshots go to the public Repsy repository `https://repo.repsy.io/buijs-dev/maven2`, never to Maven Central. It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
+The build logic shared by all buijs-dev JVM repositories: convention plugins and a version catalog, published as build tooling: releases and snapshots go to the public Repsy repository `https://repo.repsy.io/mvn/buijs-dev/maven`, never to Maven Central. It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
 
 ## Use
 
@@ -9,7 +9,7 @@ In `settings.gradle.kts`:
 ```kotlin
 pluginManagement {
     repositories {
-        maven("https://repo.repsy.io/buijs-dev/maven2") {
+        maven("https://repo.repsy.io/mvn/buijs-dev/maven") {
             mavenContent { includeGroupByRegex("dev\\.buijs.*") }
         }
         gradlePluginPortal()

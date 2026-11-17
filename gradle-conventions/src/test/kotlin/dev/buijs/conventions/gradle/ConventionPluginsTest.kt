@@ -51,7 +51,7 @@ class ConventionPluginsTest {
         assertThat(repositories.map { it.name })
             .containsExactly("Gradle Central Plugin Repository", "MavenRepo", "MavenLocal", "Repsy")
         assertThat((repositories.getByName("Repsy") as MavenArtifactRepository).url.toString())
-            .isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
+            .isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
     }
 
     @Test

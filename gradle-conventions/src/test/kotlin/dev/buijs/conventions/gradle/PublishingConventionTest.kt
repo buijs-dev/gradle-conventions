@@ -133,7 +133,9 @@ class PublishingConventionTest {
     fun `without conventions mavenCentral everything goes to Repsy only`() {
         val project = library()
 
-        assertThat(project.repsy.url.toString()).isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
+        assertThat(
+            project.repsy.url.toString(),
+        ).isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
         assertThat(project.tasks.names)
             .contains(
                 "publishAllPublicationsToRepsyRepository",
@@ -157,7 +159,9 @@ class PublishingConventionTest {
     fun `conventions mavenCentral adds Maven Central next to Repsy`() {
         val project = library(CENTRAL_PROPERTIES)
 
-        assertThat(project.repsy.url.toString()).isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
+        assertThat(
+            project.repsy.url.toString(),
+        ).isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
         assertThat(project.tasks.names)
             .contains(
                 "publishAllPublicationsToRepsyRepository",
