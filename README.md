@@ -1,12 +1,22 @@
 # Gradle Conventions
 
-The build logic shared by all buijs-dev JVM repositories: convention plugins and a version catalog, published like any other artifact (releases to Maven Central, snapshots to Repsy). It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
+The build logic shared by all buijs-dev JVM repositories: convention plugins and a version catalog, published as build tooling: releases and snapshots go to the public Repsy repository `https://repo.repsy.io/buijs-dev/maven2`, never to Maven Central. It is the Gradle counterpart of [ci-templates](https://github.com/buijs-dev/ci-templates).
 
 ## Use
 
 In `settings.gradle.kts`:
 
 ```kotlin
+pluginManagement {
+    repositories {
+        maven("https://repo.repsy.io/buijs-dev/maven2") {
+            mavenContent { includeGroupByRegex("dev\\.buijs.*") }
+        }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 plugins {
     id("dev.buijs.conventions.settings") version "<version>"
     // or, for a build with Quarkus modules:
@@ -25,7 +35,10 @@ conventions.repository=rialto-jvm
 conventions.displayName=Rialto JVM
 # optional: conventions.licenseHeaderFile=LICENSE_HEADER
 # optional: conventions.license=Apache-2.0 (POM licence; default MIT)
+# optional: conventions.mavenCentral=true (a public library that releases to Maven Central)
 ```
+
+Reading Repsy needs no credentials.
 
 ## Plugins
 
@@ -34,8 +47,8 @@ conventions.displayName=Rialto JVM
 | `dev.buijs.conventions.library` | a published Kotlin library: all of the below plus `java-library`; the javadoc jar holds the module's Dokka HTML |
 | `dev.buijs.conventions.gradle-plugin` | a published Gradle plugin: all of the below plus `java-gradle-plugin`; the javadoc jar holds the module's Dokka HTML |
 | `dev.buijs.conventions.kotlin` | Kotlin JVM on Java 25, a sources jar, JUnit Platform |
-| `dev.buijs.conventions.repositories` | Gradle Plugin Portal, Maven Central (releases), Maven Local and Repsy (`dev.buijs` snapshots) |
-| `dev.buijs.conventions.publishing` | the vanniktech maven-publish plugin: POM defaults, releases to Maven Central (`publishToMavenCentral`, signed when a signing key is present) and snapshots to the `Repsy` repository (`publishAllPublicationsToRepsyRepository`), as ci-templates publishes them |
+| `dev.buijs.conventions.repositories` | Gradle Plugin Portal, Maven Central (library releases), Maven Local and Repsy (`dev.buijs` snapshots and build tooling, read without credentials) |
+| `dev.buijs.conventions.publishing` | the vanniktech maven-publish plugin: POM defaults and the javadoc and sources jars; the `Repsy` repository (`publishAllPublicationsToRepsyRepository`, with `REPSY_USERNAME` and `REPSY_PASSWORD`) for all snapshots and for build tooling releases; with `conventions.mavenCentral=true` also Maven Central (`publishToMavenCentral`). Signed when a signing key is present. These are the targets of the ci-templates publish workflows |
 | `dev.buijs.conventions.formatting` | the style plugin with the license header (default MIT, Buijs Software) |
 | `dev.buijs.conventions.coverage` | Kover on JaCoCo, XML and HTML reports on `check` |
 | `dev.buijs.conventions.dokka` | Dokka HTML per module, with source links to GitHub |
