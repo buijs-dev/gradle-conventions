@@ -37,8 +37,5 @@ fun RepositoryHandler.buijsDev() {
     maven {
         name = "Repsy"
         setUrl(REPSY_URL)
-        mavenContent {
-            includeGroupByRegex("dev\\.buijs.*")
-        }
     }
 }

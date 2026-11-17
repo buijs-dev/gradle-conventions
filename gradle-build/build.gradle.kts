@@ -7,11 +7,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     // The style plugin, releases and snapshots.
-    maven("https://repo.repsy.io/mvn/buijs-dev/maven") {
-        mavenContent {
-            includeGroupByRegex("dev\\.buijs.*")
-        }
-    }
+    maven("https://repo.repsy.io/mvn/buijs-dev/maven")
 }
 
 // The Kotlin behind this build's own scripts, shared with gradle-conventions so the two can't

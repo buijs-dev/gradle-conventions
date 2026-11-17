@@ -9,9 +9,7 @@ In `settings.gradle.kts`:
 ```kotlin
 pluginManagement {
     repositories {
-        maven("https://repo.repsy.io/mvn/buijs-dev/maven") {
-            mavenContent { includeGroupByRegex("dev\\.buijs.*") }
-        }
+        maven("https://repo.repsy.io/mvn/buijs-dev/maven")
         gradlePluginPortal()
         mavenCentral()
     }
