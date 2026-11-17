@@ -33,11 +33,13 @@ internal fun Project.conventionProperty(name: String): String =
  * from `conventions.group`, `conventions.repository` and `conventions.displayName` there. A
  * module only sets its own `description`.
  *
- * Releases go to Maven Central, snapshots to Repsy, as the buijs-dev/ci-templates publish
- * workflows expect: `publishToMavenCentral` (Central Portal, released automatically once it
- * validates) and `publishAllPublicationsToRepsyRepository`. Publications are signed only when a
- * signing key is present (`signingInMemoryKey` or `signing.keyId`), so local and snapshot
- * builds need none.
+ * Every project publishes to Repsy (`publishAllPublicationsToRepsyRepository`, to
+ * [REPSY_URL]): all snapshots, and the releases of build tooling. A public library opts in to
+ * Maven Central with `conventions.mavenCentral=true` in gradle.properties, which adds
+ * `publishToMavenCentral` (Central Portal, released automatically once it validates); without
+ * it nothing is set up for Central. These are the tasks the buijs-dev/ci-templates publish
+ * workflows run. Publications are signed only when a signing key is present
+ * (`signingInMemoryKey` or `signing.keyId`), so local and snapshot builds need none.
  */
 fun Project.configurePublishing() {
     group = conventionProperty("group")
@@ -48,12 +50,14 @@ fun Project.configurePublishing() {
     val pomName = if (this == rootProject) displayName else "$displayName - $name"
     val pomDescription = provider { description }
 
+    val mavenCentral =
+        providers.gradleProperty("conventions.mavenCentral").orNull.toBoolean()
     val signed =
         providers.gradleProperty("signingInMemoryKey").isPresent ||
             providers.gradleProperty("signing.keyId").isPresent
 
     extensions.configure(MavenPublishBaseExtension::class.java) {
-        publishToMavenCentral(automaticRelease = true)
+        if (mavenCentral) publishToMavenCentral(automaticRelease = true)
         if (signed) signAllPublications()
 
         pom {
@@ -97,7 +101,7 @@ fun Project.configurePublishing() {
         repositories {
             maven {
                 name = "Repsy"
-                setUrl("https://repo.repsy.io/mvn/buijs-dev/maven")
+                setUrl(REPSY_URL)
                 credentials {
                     username = providers.environmentVariable("REPSY_USERNAME").orNull
                     password = providers.environmentVariable("REPSY_PASSWORD").orNull

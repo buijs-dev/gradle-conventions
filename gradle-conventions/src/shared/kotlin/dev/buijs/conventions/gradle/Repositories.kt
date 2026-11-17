@@ -20,8 +20,15 @@ package dev.buijs.conventions.gradle
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 
 /**
- * The repositories every build resolves from: the public repositories (releases of `dev.buijs`
- * artifacts come from Maven Central), Maven Local, and Repsy for the `dev.buijs` snapshots.
+ * The public Repsy repository of buijs-dev: all `dev.buijs` snapshots and the releases of the
+ * build tooling. Reading it needs no credentials.
+ */
+const val REPSY_URL = "https://repo.repsy.io/buijs-dev/maven2"
+
+/**
+ * The repositories every build resolves from: the public repositories (releases of the
+ * `dev.buijs` libraries come from Maven Central), Maven Local, and Repsy for the `dev.buijs`
+ * snapshots and build tooling.
  */
 fun RepositoryHandler.buijsDev() {
     gradlePluginPortal()
@@ -29,9 +36,8 @@ fun RepositoryHandler.buijsDev() {
     mavenLocal()
     maven {
         name = "Repsy"
-        setUrl("https://repo.repsy.io/mvn/buijs-dev/maven")
+        setUrl(REPSY_URL)
         mavenContent {
-            snapshotsOnly()
             includeGroupByRegex("dev\\.buijs.*")
         }
     }

@@ -23,6 +23,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.testing.junitplatform.JUnitPlatformOptions
+import org.gradle.internal.artifacts.repositories.AuthenticationSupportedInternal
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -50,7 +51,16 @@ class ConventionPluginsTest {
         assertThat(repositories.map { it.name })
             .containsExactly("Gradle Central Plugin Repository", "MavenRepo", "MavenLocal", "Repsy")
         assertThat((repositories.getByName("Repsy") as MavenArtifactRepository).url.toString())
-            .isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
+            .isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
+    }
+
+    @Test
+    fun `Repsy is read anonymously`() {
+        val repsy =
+            project("dev.buijs.conventions.repositories").repositories.getByName("Repsy")
+                as AuthenticationSupportedInternal
+
+        assertThat(repsy.configuredCredentials.isPresent).isFalse()
     }
 
     @Test

@@ -1,4 +1,5 @@
-// Releases to Maven Central, snapshots to Repsy; see configurePublishing.
+// Snapshots and build tooling to Repsy, libraries with conventions.mavenCentral=true also to
+// Maven Central; see configurePublishing.
 import dev.buijs.conventions.gradle.configurePublishing
 
 plugins {

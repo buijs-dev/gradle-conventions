@@ -13,8 +13,8 @@ plugins {
     `java-library`
 }
 
-// The jars Maven Central requires: the sources from dev.buijs.conventions.kotlin
-// (withSourcesJar), and as Javadoc this module's Dokka HTML, which javadoc.io shows.
+// The jars every publication carries, as Maven Central requires: the sources from
+// dev.buijs.conventions.kotlin (withSourcesJar), and as Javadoc this module's Dokka HTML.
 mavenPublishing {
     configure(KotlinJvm(JavadocJar.Dokka("dokkaGeneratePublicationHtml"), SourcesJar.None()))
 }

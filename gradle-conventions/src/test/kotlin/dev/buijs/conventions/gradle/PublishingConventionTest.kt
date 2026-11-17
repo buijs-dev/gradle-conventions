@@ -121,22 +121,60 @@ class PublishingConventionTest {
     }
 
     @Test
-    fun `snapshots go to Repsy and releases to Maven Central`() {
-        val project = library()
-        val repsy =
-            project.extensions
-                .getByType(PublishingExtension::class.java)
-                .repositories
-                .getByName("Repsy") as MavenArtifactRepository
+    fun `with conventions mavenCentral the publication still carries the sources and the javadoc`() {
+        val publication =
+            library(CENTRAL_PROPERTIES).publications.getByName("maven") as MavenPublicationInternal
 
-        assertThat(repsy.url.toString()).isEqualTo("https://repo.repsy.io/mvn/buijs-dev/maven")
+        assertThat(publication.publishableArtifacts.map { it.classifier })
+            .contains("sources", "javadoc")
+    }
+
+    @Test
+    fun `without conventions mavenCentral everything goes to Repsy only`() {
+        val project = library()
+
+        assertThat(project.repsy.url.toString()).isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
         assertThat(project.tasks.names)
             .contains(
                 "publishAllPublicationsToRepsyRepository",
                 "publishMavenPublicationToRepsyRepository",
+            ).doesNotContain(
                 "publishToMavenCentral",
                 "publishMavenPublicationToMavenCentralRepository",
             )
+        assertThat(project.publishingRepositories.names).containsExactly("Repsy")
+    }
+
+    @Test
+    fun `conventions mavenCentral false sets up no Maven Central`() {
+        val project = library(DEFAULT_PROPERTIES + ("conventions.mavenCentral" to "false"))
+
+        assertThat(project.tasks.names).doesNotContain("publishToMavenCentral")
+        assertThat(project.publishingRepositories.names).containsExactly("Repsy")
+    }
+
+    @Test
+    fun `conventions mavenCentral adds Maven Central next to Repsy`() {
+        val project = library(CENTRAL_PROPERTIES)
+
+        assertThat(project.repsy.url.toString()).isEqualTo("https://repo.repsy.io/buijs-dev/maven2")
+        assertThat(project.tasks.names)
+            .contains(
+                "publishAllPublicationsToRepsyRepository",
+                "publishToMavenCentral",
+                "publishMavenPublicationToMavenCentralRepository",
+            )
+        assertThat(
+            project.publishingRepositories.names,
+        ).containsExactlyInAnyOrder("Repsy", "mavenCentral")
+    }
+
+    @Test
+    fun `the Repsy repository reads its credentials from REPSY_USERNAME and REPSY_PASSWORD`() {
+        val credentials = library().repsy.credentials
+
+        assertThat(credentials.username).isEqualTo(System.getenv("REPSY_USERNAME"))
+        assertThat(credentials.password).isEqualTo(System.getenv("REPSY_PASSWORD"))
     }
 
     @Test
@@ -145,6 +183,21 @@ class PublishingConventionTest {
 
         assertThat(project.pluginManager.hasPlugin("signing")).isFalse()
         assertThat(project.tasks.names.filter { it.startsWith("sign") }).isEmpty()
+    }
+
+    @Test
+    fun `with conventions mavenCentral but without a signing key nothing is signed`() {
+        val project = library(CENTRAL_PROPERTIES)
+
+        assertThat(project.pluginManager.hasPlugin("signing")).isFalse()
+        assertThat(project.tasks.names.filter { it.startsWith("sign") }).isEmpty()
+    }
+
+    @Test
+    fun `with conventions mavenCentral an in-memory signing key signs every publication`() {
+        val project = library(CENTRAL_PROPERTIES + ("signingInMemoryKey" to "key"))
+
+        assertThat(project.tasks.names).contains("signMavenPublication")
     }
 
     @Test
@@ -162,18 +215,19 @@ class PublishingConventionTest {
     }
 
     @Test
-    fun `a Gradle plugin publishes its marker to Maven Central and Repsy alike`() {
-        val project =
-            conventionsProject(dir, plugins = arrayOf("dev.buijs.conventions.gradle-plugin"))
-        project.extensions
-            .getByType(org.gradle.plugin.devel.GradlePluginDevelopmentExtension::class.java)
-            .plugins
-            .create("sample") {
-                id = "dev.buijs.sample.plugin"
-                implementationClass = "dev.buijs.sample.SamplePlugin"
-            }
+    fun `a Gradle plugin publishes its marker to Repsy only by default`() {
+        val project = gradlePlugin(DEFAULT_PROPERTIES)
 
-        project.evaluated()
+        assertThat(project.publications.names)
+            .contains("pluginMaven", "samplePluginMarkerMaven")
+        assertThat(project.tasks.names)
+            .contains("publishSamplePluginMarkerMavenPublicationToRepsyRepository")
+            .doesNotContain("publishSamplePluginMarkerMavenPublicationToMavenCentralRepository")
+    }
+
+    @Test
+    fun `with conventions mavenCentral a Gradle plugin publishes its marker to Maven Central and Repsy alike`() {
+        val project = gradlePlugin(CENTRAL_PROPERTIES)
 
         assertThat(project.publications.names)
             .contains("pluginMaven", "samplePluginMarkerMaven")
@@ -185,5 +239,29 @@ class PublishingConventionTest {
 
             assertThat(task.onlyIf.isSatisfiedBy(task)).describedAs(repository).isTrue()
         }
+    }
+
+    private fun gradlePlugin(properties: Map<String, String>): Project {
+        val project =
+            conventionsProject(dir, properties, "dev.buijs.conventions.gradle-plugin")
+        project.extensions
+            .getByType(org.gradle.plugin.devel.GradlePluginDevelopmentExtension::class.java)
+            .plugins
+            .create("sample") {
+                id = "dev.buijs.sample.plugin"
+                implementationClass = "dev.buijs.sample.SamplePlugin"
+            }
+
+        return project.evaluated()
+    }
+
+    private val Project.publishingRepositories
+        get() = extensions.getByType(PublishingExtension::class.java).repositories
+
+    private val Project.repsy
+        get() = publishingRepositories.getByName("Repsy") as MavenArtifactRepository
+
+    private companion object {
+        val CENTRAL_PROPERTIES = DEFAULT_PROPERTIES + ("conventions.mavenCentral" to "true")
     }
 }

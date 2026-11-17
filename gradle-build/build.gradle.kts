@@ -6,10 +6,9 @@ repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
-    // The style plugin's snapshots.
-    maven("https://repo.repsy.io/mvn/buijs-dev/maven") {
+    // The style plugin, releases and snapshots.
+    maven("https://repo.repsy.io/buijs-dev/maven2") {
         mavenContent {
-            snapshotsOnly()
             includeGroupByRegex("dev\\.buijs.*")
         }
     }
