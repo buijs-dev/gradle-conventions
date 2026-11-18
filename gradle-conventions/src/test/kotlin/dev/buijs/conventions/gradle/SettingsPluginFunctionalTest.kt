@@ -190,9 +190,15 @@ class SettingsPluginFunctionalTest {
                 id("dev.buijs.conventions.settings")
             }
 
-            // The shared catalog, published by this build's gradle-catalog.
+            // The shared catalog, published by this build's gradle-catalog, and only from there:
+            // Maven Local and Repsy may hold an older one.
             dependencyResolutionManagement {
-                repositories { maven { url = uri("$testRepository") } }
+                repositories {
+                    exclusiveContent {
+                        forRepository { maven { url = uri("$testRepository") } }
+                        filter { includeModule("dev.buijs.conventions", "gradle-catalog") }
+                    }
+                }
             }
 
             rootProject.name = "sample"
