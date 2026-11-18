@@ -86,7 +86,13 @@ class QuarkusConventionsTest {
             }
 
             dependencyResolutionManagement {
-                repositories { maven { url = uri("$repository") } }
+                // Only from the test repository: Maven Local and Repsy may hold an older catalog.
+                repositories {
+                    exclusiveContent {
+                        forRepository { maven { url = uri("$repository") } }
+                        filter { includeModule("dev.buijs.conventions", "gradle-catalog") }
+                    }
+                }
             }
 
             rootProject.name = "sample"
