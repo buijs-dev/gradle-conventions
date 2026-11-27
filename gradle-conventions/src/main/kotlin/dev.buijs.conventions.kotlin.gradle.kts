@@ -15,11 +15,9 @@ kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_25
         javaParameters = true
-        // Annotations on constructor properties go to the parameter and the property, as Kotlin
-        // will do by default; frameworks such as Quarkus read them from either.
-        freeCompilerArgs.set(
-            listOf("-Xjsr305=strict", "-Xannotation-default-target=param-property"),
-        )
+        // Annotations on constructor properties go to the parameter and the property: the default since
+        // Kotlin 2.4, so no flag is needed; frameworks such as Quarkus read them from either.
+        freeCompilerArgs.set(listOf("-Xjsr305=strict"))
     }
 }
 
